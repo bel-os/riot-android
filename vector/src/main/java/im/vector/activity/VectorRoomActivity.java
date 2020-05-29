@@ -106,8 +106,11 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import butterknife.OnTouch;
+import im.vector.BuildConfig;
 import im.vector.Matrix;
+import im.vector.MultipleClickListener;
 import im.vector.R;
+import im.vector.Utils;
 import im.vector.VectorApp;
 import im.vector.activity.util.RequestCodesKt;
 import im.vector.dialogs.DialogCallAdapter;
@@ -4030,7 +4033,20 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
     }
 
     @OnClick(R.id.room_start_call_image_view)
-    void onStartCallClick() {
+    void onMutlipleClick() {
+        if (BuildConfig.IS_SABA) {
+            Utils.detectClicks(new MultipleClickListener() {
+                @Override
+                public void on5TimesClicked() {
+                    onStartCallClick();
+                }
+            });
+        } else {
+            onStartCallClick();
+        }
+    }
+
+     void onStartCallClick() {
         if ((null != mRoom) && mRoom.isEncrypted() && (mRoom.getNumberOfMembers() > 2)) {
             // display the dialog with the info text
             new AlertDialog.Builder(this)
