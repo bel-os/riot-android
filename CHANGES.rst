@@ -1,3 +1,29 @@
+Changes in Riot 0.9.13 (2020-XX-XX)
+===================================================
+
+MatrixSdk 🚀:
+ - Upgrade MatrixSdk to version 0.X.Y.
+ - Changelog: https://github.com/matrix-org/matrix-android-sdk/releases/tag/v0.X.Y
+
+Features ✨:
+ -
+
+Improvements 🙌:
+ - Remove jQuery library. Fixes #3381
+
+Other changes:
+ - Fix F-Droid badge and improve formatting and capitalization in README (#3492)
+ -
+
+Bug fixes 🐛:
+ -
+
+Translations 🗣:
+ -
+
+Build 🧱:
+ -
+
 Changes in Riot 0.9.12 (2020-05-20)
 ===================================================
 
