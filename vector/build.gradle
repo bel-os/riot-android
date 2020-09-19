@@ -148,10 +148,10 @@ android {
 
         saba {
             applicationId "ir.batna.messaging"
-            versionCode 9905261
-            versionName "Mordad99-C"
+            versionCode 9906161
+            versionName "Shahrivar-A"
             buildConfigField "boolean", "IS_SABA", "true"
-            buildConfigField "boolean", "ALLOW_HOME_SERVER_CHANGE", "true"
+            buildConfigField "boolean", "ALLOW_HOME_SERVER_CHANGE", "false"
             buildConfigField "boolean", "ALLOW_FCM_USE", "false"
             buildConfigField "String", "SHORT_FLAVOR_DESCRIPTION", "\"S\""
             buildConfigField "String", "FLAVOR_DESCRIPTION", "\"Saba\""
