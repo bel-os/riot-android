@@ -225,6 +225,8 @@ public class EventStreamService extends Service {
         public void onLiveEventsChunkProcessed(String fromToken, String toToken) {
             Log.d(LOG_TAG, "%%%%%%%%  MXEventListener: onLiveEventsChunkProcessed[" + fromToken + "->" + toToken + "]");
 
+
+
             VectorApp.getInstance().getNotificationDrawerManager().refreshNotificationDrawer(new OutdatedEventDetector(EventStreamService.this));
 
             // do not suspend the application if there is some active calls

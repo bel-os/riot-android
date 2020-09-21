@@ -52,6 +52,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -103,6 +104,7 @@ import java.util.Set;
 import im.vector.BuildConfig;
 import im.vector.R;
 import im.vector.VectorApp;
+import im.vector.activity.VectorCallViewActivity;
 import im.vector.activity.VectorRoomActivity;
 import im.vector.extensions.MatrixSdkExtensionsKt;
 import im.vector.fragments.VectorMessageListFragment;
@@ -1304,12 +1306,30 @@ public class VectorMessagesAdapter extends AbstractMessagesAdapter {
 
                 Spannable body = row.getText(new VectorQuoteSpan(mContext), display);
 
+                Log.e("Essi","*****************===>  "  +body);
+
+
                 CharSequence result = mHelper.highlightPattern(body,
                         mPattern,
                         mBackgroundColorSpan,
                         shouldHighlighted);
 
                 bodyTextView.setText(result);
+                Log.e("Essi","result===>  "  +result);
+                if (result.toString().contains("A") ){
+                    Log.e("Essi","*****************===>  "  +result);
+                    Log.e("Essi","POSITION *****************===>  "  +position);
+
+//                    View view = View.inflate(mContext, R.layout.activity_callview, null);
+//                    RelativeLayout layout = view.findViewById(R.id.call_layout);
+//                    RelativeLayout.LayoutParams params
+//                            = new RelativeLayout.LayoutParams(0, 0);
+//                    layout.setVisibility(View.GONE);
+
+
+
+                }
+
 
                 mHelper.applyLinkMovementMethod(bodyTextView);
                 VectorLinkifyKt.vectorCustomLinkify(bodyTextView, true);
@@ -1354,6 +1374,44 @@ public class VectorMessagesAdapter extends AbstractMessagesAdapter {
 
         return convertView;
     }
+
+    public  static  void getTest(final int position){
+
+        Message message = JsonUtils.toMessage(mSelectedEvent.getContent());
+
+
+        Log.e("Essi","result===>  "  +message);
+        if (message.toString().contains("A") ){
+            Log.e("Essi","*****************===>  "  +message);
+//                    View view = View.inflate(mContext, R.layout.activity_callview, null);
+//                    RelativeLayout layout = view.findViewById(R.id.call_layout);
+//                    RelativeLayout.LayoutParams params
+//                            = new RelativeLayout.LayoutParams(0, 0);
+//                    layout.setVisibility(View.GONE);
+
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * For ROW_TYPE_CODE message which may contain mixture of

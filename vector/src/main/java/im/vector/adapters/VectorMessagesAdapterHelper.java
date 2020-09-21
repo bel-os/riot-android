@@ -941,6 +941,8 @@ class VectorMessagesAdapterHelper {
      * @return CharSequence of the text with highlighted pattern
      */
     CharSequence highlightPattern(Spannable text, String pattern, CharacterStyle highLightTextStyle, boolean isHighlighted) {
+Log.e("Essi","************************");
+
         if (!TextUtils.isEmpty(pattern) && !TextUtils.isEmpty(text) && (text.length() >= pattern.length())) {
 
             String lowerText = text.toString().toLowerCase(VectorLocale.INSTANCE.getApplicationLocale());

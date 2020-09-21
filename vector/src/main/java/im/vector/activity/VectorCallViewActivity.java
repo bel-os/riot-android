@@ -20,7 +20,10 @@ package im.vector.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -47,6 +50,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.matrix.androidsdk.MXSession;
@@ -149,6 +153,11 @@ public class VectorCallViewActivity extends VectorAppCompatActivity implements S
     // on Samsung devices, the application is suspended when the screen is turned off
     // so the call must not be suspended
     private boolean mIsScreenOff = false;
+
+    public static final String VIDEO_RECEIVER = "VIDEO_RECEIVER";
+    public static final String VIDEO_SENDER = "VIDEO_RECEIVER";
+
+
     private final IMXCallListener mListener = new MXCallListener() {
         @Override
         public void onStateDidChange(String state) {
@@ -656,6 +665,17 @@ public class VectorCallViewActivity extends VectorAppCompatActivity implements S
     @Override
     protected void onStop() {
         super.onStop();
+//
+//        LocalBroadcastManager localBroadcastManagerSend = LocalBroadcastManager.getInstance(VectorCallViewActivity.this);
+//        Log.e("Essi", "localBroadcastManager   ===>    " + localBroadcastManagerSend);
+//        Intent intentBroadcast = new Intent();
+//        intentBroadcast.setAction("ESM");
+//        intentBroadcast.addCategory("ESM");
+//        intentBroadcast.putExtra(VectorCallViewActivity.VIDEO_SENDER, "A");
+//        localBroadcastManagerSend.sendBroadcast(intentBroadcast);
+//        Log.e("Essi3","*************broadcastVideoSend************************");
+
+        broadcastVideoSend("A");
 
         // called when the application is put in background
         if (!mIsScreenOff) {
@@ -694,9 +714,54 @@ public class VectorCallViewActivity extends VectorAppCompatActivity implements S
         CallSoundsManager.getSharedInstance(this).removeAudioConfigurationListener(mAudioConfigListener);
     }
 
+
+    BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String state = intent.getStringExtra(VectorCallViewActivity.VIDEO_RECEIVER);
+            Log.e("Essi", "================================ VIDEO_RECEIVER =============================");
+            Log.e("Essi", "onReceive state  ==> " + state);
+
+
+            if (state.equals("A")) {
+                if (findViewById(R.id.call_other_member).getVisibility() == View.GONE)
+                    findViewById(R.id.call_other_member).setVisibility(View.VISIBLE);
+
+                if (null != mCallView) {
+                    findViewById(R.id.call_other_member).setVisibility(View.VISIBLE);
+                    // insert the call view above the avatar
+                    RelativeLayout layout = findViewById(R.id.call_layout);
+                    RelativeLayout.LayoutParams params
+                            = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                    layout.removeView(mCallView);
+                    layout.setVisibility(View.VISIBLE);
+
+                    if (mCall.isVideo()) {
+                        if (null != mCallView.getParent()) {
+                            ((ViewGroup) mCallView.getParent()).removeView(mCallView);
+                        }
+                        findViewById(R.id.call_other_member).setVisibility(View.VISIBLE);
+                    }
+                    mCall.setVisibility(View.GONE);
+                }
+            } else if (state.equals("B")) {
+                recreate();
+            }
+        }
+    };
     @Override
     protected void onResume() {
         super.onResume();
+        broadcastVideoSend("B");
+        Log.e("Essi","broadcastVideoSend()");
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("iman1");
+        intentFilter.addCategory("iman1");
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(mMessageReceiver, intentFilter);
+
 
         if (null == mCallsManager.getActiveCall()) {
             Log.d(LOG_TAG, "## onResume() : the call does not exist anymore");
@@ -1339,5 +1404,17 @@ public class VectorCallViewActivity extends VectorAppCompatActivity implements S
         finish();
     }
 
+
+    private void broadcastVideoSend(String s) {
+            LocalBroadcastManager localBroadcastManagerSend = LocalBroadcastManager.getInstance(VectorCallViewActivity.this);
+            Log.e("Essi", "localBroadcastManager   ===>    " + localBroadcastManagerSend);
+            Intent intentBroadcast = new Intent();
+            intentBroadcast.setAction("ESM");
+            intentBroadcast.addCategory("ESM");
+            intentBroadcast.putExtra(VectorCallViewActivity.VIDEO_SENDER, s);
+            localBroadcastManagerSend.sendBroadcast(intentBroadcast);
+        Log.e("Essi3","*************broadcastVideoSend************************");
+
+    }
 
 }

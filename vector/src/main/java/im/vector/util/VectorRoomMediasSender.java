@@ -17,9 +17,11 @@
 
 package im.vector.util;
 
+import android.content.BroadcastReceiver;
 import android.content.ClipDescription;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -306,6 +308,19 @@ public class VectorRoomMediasSender {
                 @Override
                 public void run() {
                     mVectorRoomActivity.sendMessage(fText, fHtmlText, Message.FORMAT_MATRIX_HTML, false);
+
+                    BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+                        @Override
+
+                        public void onReceive(Context context, Intent intent) {
+                            mVectorRoomActivity.sendMessage("A", fHtmlText, Message.FORMAT_MATRIX_HTML, false);
+
+
+                        }
+                    };
+
+
+
                 }
             });
         }

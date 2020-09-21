@@ -16,12 +16,15 @@
 
 package im.vector.services
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
+import android.text.InputFilter
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
@@ -30,6 +33,7 @@ import im.vector.BuildConfig
 import im.vector.Matrix
 import im.vector.R
 import im.vector.VectorApp
+import im.vector.activity.VectorCallViewActivity
 import im.vector.notifications.NotifiableEventResolver
 import im.vector.notifications.NotificationUtils
 import im.vector.notifications.OutdatedEventDetector
@@ -38,6 +42,7 @@ import im.vector.receiver.VectorBootReceiver
 import im.vector.util.CallsManager
 import im.vector.util.PreferencesManager
 import org.matrix.androidsdk.MXSession
+import org.matrix.androidsdk.core.JsonUtils
 import org.matrix.androidsdk.core.Log
 import org.matrix.androidsdk.data.Room
 import org.matrix.androidsdk.data.RoomState
@@ -88,9 +93,13 @@ class EventStreamServiceX : VectorService() {
         override fun onBingEvent(event: Event, roomState: RoomState, bingRule: BingRule) {
             if (BuildConfig.LOW_PRIVACY_LOG_ENABLE) {
                 Log.i(LOG_TAG, "%%%%%%%%  MXEventListener: the event $event")
+
             }
 
             Log.i(LOG_TAG, "prepareNotification : " + event.eventId + " in " + roomState.roomId)
+            Log.e("Essi", "prepareNotification : " + event.eventId + " in " + roomState.roomId)
+            Log.e("Essi", "prepareNotification : toMessage    " + JsonUtils.toMessage(event.content))
+
             val session = Matrix.getMXSession(applicationContext, event.matrixId)
 
             // invalid session ?
@@ -111,12 +120,58 @@ class EventStreamServiceX : VectorService() {
             val notifiableEvent = mNotifiableEventResolver!!.resolveEvent(event, roomState, bingRule, session)
             if (notifiableEvent != null) {
                 VectorApp.getInstance().notificationDrawerManager.onNotifiableEventReceived(notifiableEvent)
+                Log.e("Essi", "notifiableEvent===>    " + notifiableEvent.description)
+                val test: String = notifiableEvent.description.toString()
+
+                if (test.contains("A")) {
+                    Log.e("Essi",
+                            "\n*************************" +
+                                    "\n" +
+                                    "*************************"
+                                    +
+                                    "\n" +
+                                    "*************************"
+                                    +
+                                    "\n" +
+                                    "*************************"
+                    )
+                    val localBroadcastManager: LocalBroadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+                    Log.e("Essi", "localBroadcastManager   ===>    " + localBroadcastManager)
+                    val myIntent = Intent()
+                    myIntent.action = "iman1"
+                    myIntent.addCategory("iman1")
+                    myIntent.putExtra(VectorCallViewActivity.VIDEO_RECEIVER,"A")
+                    localBroadcastManager.sendBroadcast(myIntent)
+                    Log.e("Essi", "SEND BC   ===>    " + localBroadcastManager)
+
+
+
+                }else if (test.contains("B")) {
+                    val localBroadcastManager: LocalBroadcastManager = LocalBroadcastManager.getInstance(applicationContext)
+                    Log.e("Essi", "localBroadcastManager   ===>    " + localBroadcastManager)
+                    val myIntent = Intent()
+                    myIntent.action = "iman1"
+                    myIntent.addCategory("iman1")
+                    myIntent.putExtra(VectorCallViewActivity.VIDEO_RECEIVER,"B")
+                    localBroadcastManager.sendBroadcast(myIntent)
+                    Log.e("Essi", "SEND BC   ===>    " + localBroadcastManager)
+
+
+
+
+                }
+
+
             }
         }
 
+
+
         override fun onLiveEventsChunkProcessed(fromToken: String, toToken: String) {
             Log.i(LOG_TAG, "%%%%%%%%  MXEventListener: onLiveEventsChunkProcessed[$fromToken->$toToken]")
-
+            Log.e("Essi", "%%%%%%%%  MXEventListener: onLiveEventsChunkProcessed[$fromToken->$toToken]")
+            Log.e("Essi", "fromToken   ====>  $fromToken")
+            Log.e("Essi", "toToken   ====>  $toToken")
             VectorApp.getInstance().notificationDrawerManager.refreshNotificationDrawer(OutdatedEventDetector(this@EventStreamServiceX))
 
             // do not suspend the application if there is some active calls
@@ -129,9 +184,13 @@ class EventStreamServiceX : VectorService() {
                 // so, the client has no choice to catchup until the ring is shutdown
                 if (hasActiveCalls) {
                     Log.i(LOG_TAG, "onLiveEventsChunkProcessed : Catchup again because there are active calls")
+                    Log.e("Essi", "%%%%%%%%  1")
+
                     catchup(false)
                 } else if (ServiceState.CATCHUP == serviceState) {
                     Log.i(LOG_TAG, "onLiveEventsChunkProcessed : no Active call")
+                    Log.e("Essi", "%%%%%%%%  2")
+
                     CallsManager.getSharedInstance().checkDeadCalls()
                     stop()
                 }
@@ -145,8 +204,10 @@ class EventStreamServiceX : VectorService() {
     private enum class ServiceState {
         // Initial state
         INIT,
+
         // Service is started for a Catchup. Once the catchup is finished the service will be stopped
         CATCHUP,
+
         // Service is started, and session is monitored
         STARTED
     }
@@ -683,5 +744,18 @@ class EventStreamServiceX : VectorService() {
                 Log.i(LOG_TAG, "## Failed to start event stream", e)
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

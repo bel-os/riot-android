@@ -23,9 +23,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -65,6 +67,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.JsonParser;
 
@@ -528,6 +531,8 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
 
         }
     };
+    BroadcastReceiver mReceiver;
+    boolean countBC =false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint({"WrongViewCast", "ClickableViewAccessibility"})
@@ -1457,7 +1462,25 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+        countBC=true;
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
 
+                if (countBC){
+                    Log.e("Essi2", "VECTOR ROOM ACTIVITY ");
+                    Log.e("Essi2", "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+                    Log.e("Essi2", "================================ onReceive =============================");
+
+                    String s = intent.getStringExtra(VectorCallViewActivity.VIDEO_SENDER);
+                    Log.e("Essi2", "String  s  ==>   "  +s );
+
+                    sendMessage(s, "", Message.FORMAT_MATRIX_HTML, false);
+                }
+                countBC=false;
+
+            }
+        };
         if (mReadMarkerManager != null) {
             mReadMarkerManager.onPause();
         }
@@ -1491,6 +1514,36 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
     protected void onResume() {
         Log.d(LOG_TAG, "++ Resume the activity");
         super.onResume();
+
+        countBC=true;
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                if (countBC){
+                    Log.e("Essi2", "VECTOR ROOM ACTIVITY ");
+                    Log.e("Essi2", "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+                    Log.e("Essi2", "================================ onReceive =============================");
+
+                    String s = intent.getStringExtra(VectorCallViewActivity.VIDEO_SENDER);
+                    Log.e("Essi2", "String  s  ==>   "  +s );
+
+            sendMessage(s, "", Message.FORMAT_MATRIX_HTML, false);
+                }
+                countBC=false;
+
+            }
+        };
+
+
+
+        Log.e("Essi2", "++ Resume the activity");
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("ESM");
+        intentFilter.addCategory("ESM");
+        localBroadcastManager.registerReceiver(mReceiver, intentFilter);
+
 
         if (null != mRoom) {
             // check if the room has been left from another client.
@@ -2103,6 +2156,7 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
             requestCode = PermissionsToolsKt.PERMISSION_REQUEST_CODE_VIDEO_CALL;
             if (BuildConfig.IS_SABA) {
                 if (PermissionsToolsKt.checkPermissions(permissions, VectorRoomActivity.this, requestCode)) {
+                    Log.e("Essi", "Clicked Alert Dialog ******CALL******");
                     startIpCall(PreferencesManager.useJitsiConfCall(VectorRoomActivity.this), isVideoCall);
                 }
             }
@@ -2225,6 +2279,7 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
      * @param aIsVideoCall true to video call, false to audio call
      */
     private void startIpCall(final boolean useJitsiCall, final boolean aIsVideoCall) {
+        Log.e("Essi", "startIpCall  FUNCTION");
         if (mRoom == null) {
             return;
         }
@@ -2247,6 +2302,7 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
                     public void run() {
                         hideWaitingView();
 
+                        Log.e("Essi", "Intent VECTOR_ROOM_ACTIVITY ===> VECTOR_CALL_VIEW_ACTIVITY");
                         final Intent intent = new Intent(VectorRoomActivity.this, VectorCallViewActivity.class);
 
                         intent.putExtra(VectorCallViewActivity.EXTRA_MATRIX_ID, mSession.getCredentials().userId);
@@ -2336,6 +2392,8 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
 
         String textToSend = mEditText.getText().toString().trim();
 
+        Log.e("Essi2", "textToSend ==>    " + textToSend);
+
         final boolean handleSlashCommand;
         if (textToSend.startsWith("\\/")) {
             handleSlashCommand = false;
@@ -2353,6 +2411,9 @@ public class VectorRoomActivity extends MXCActionBarActivity implements
                         mSendImageView.setEnabled(true);
                         mIsMarkDowning = false;
                         enableActionBarHeader(HIDE_ACTION_BAR_HEADER);
+
+
+                        Log.e("Essi2", "send message ====>  " + text);
                         sendMessage(text, TextUtils.equals(text, htmlText) ? null : htmlText, Message.FORMAT_MATRIX_HTML, handleSlashCommand);
                         mEditText.setText("");
                     }
