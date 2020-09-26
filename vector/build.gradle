@@ -44,7 +44,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "im.vector"
+        applicationId "im.batna"
         minSdkVersion 21
         targetSdkVersion 28
         // use the version code
